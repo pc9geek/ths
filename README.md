@@ -1,4 +1,12 @@
 # ths
+
 Task for The Hacking School
 
-using a free mongodb at cloud.mongodb.com
+This is a small file sharing app that stores users credentials and files in a mongodb
+
+* nodejs
+* expess
+* passport
+* multer
+* multer grid dtoreage
+* mongoose
