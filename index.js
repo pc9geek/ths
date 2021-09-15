@@ -17,7 +17,17 @@ const path = require("path");
 const mongoose = require("mongoose");
 const multer = require("multer");
 const {GridFsStorage} = require("multer-gridfs-storage");
+var dbName = 'myFirstDatabase';
 const mongoURI = "mongodb+srv://ths:thspassword@cluster0.yxapw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+var MongoClient = require('mongodb').MongoClient
+const mongodb = require('mongodb');
+var app=express();
+var config = require('./config.js'), //config file contains all tokens and other private info
+funct = require('./functions.js'); 
+const { CLIENT_RENEG_LIMIT } = require('tls');
+const { Stream } = require('stream');
+
+
 
 // connection
 const conn = mongoose.createConnection(mongoURI, {
@@ -25,7 +35,7 @@ const conn = mongoose.createConnection(mongoURI, {
     useUnifiedTopology: true
   });
 
-let gfs;
+var gfs;
 conn.once("open", () => {
   // init stream
   gfs = new mongoose.mongo.GridFSBucket(conn.db, {
@@ -41,7 +51,8 @@ const storage = new GridFsStorage({
           if (err) {
             return reject(err);
           }
-          const filename = buf.toString("hex") + path.extname(file.originalname);
+          //const filename = buf.toString("hex") + path.extname(file.originalname);
+          const filename = file.originalname;
           const fileInfo = {
             filename: filename,
             bucketName: "uploads"
@@ -54,15 +65,7 @@ const storage = new GridFsStorage({
   const upload = multer({
     storage
   });
-
-
   
-
-var app=express();
-var config = require('./config.js'), //config file contains all tokens and other private info
-funct = require('./functions.js'); 
-
-
 
 //===============PASSPORT===============
 // Passport session setup.
@@ -75,6 +78,7 @@ passport.deserializeUser(function(obj, done) {
   console.log("deserializing " + obj);
   done(null, obj);
 });
+
 // Use the LocalStrategy within Passport to login/"signin" users.
 passport.use('local-signin', new LocalStrategy(
   {passReqToCallback : true}, //allows us to pass back the request to the callback
@@ -157,10 +161,33 @@ app.set('view engine', 'handlebars');
 
 //===============ROUTES===============
 //displays our homepage
-app.get('/', function(req, res){
-    res.render('home', {user: req.user, grid: gfs});
+  app.get('/', function(req, res){
+    
+    MongoClient.connect(mongoURI, function (err, client) {        
+      console.log("Connected successfully to server");
+      const db = client.db(dbName);
+      var bucket = new mongodb.GridFSBucket(db,{ bucketName: 'uploads' });  
+      let result = [];   
+        bucket.find().forEach((element , index)=> {
+        result.push(element.filename);  
+      }).then(function(){        
+        res.render('home', {user: req.user, files: result});
+      });
+    });
+   
   });
   
+  app.get('/getfile', function(req, res){
+    var filename=req.query.i;
+    MongoClient.connect(mongoURI, function (err, client) {        
+      console.log("Connected successfully to server");
+      const db = client.db(dbName);
+      var bucket = new mongodb.GridFSBucket(db,{ bucketName: 'uploads' });  
+      var downStream = bucket.openDownloadStreamByName(filename);
+      downStream.pipe(res);
+    });
+  });
+
   //displays our signup page
   app.get('/signin', function(req, res){
     res.render('signin');

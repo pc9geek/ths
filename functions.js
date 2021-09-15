@@ -7,7 +7,7 @@ var bcrypt = require('bcryptjs'),
 var dbName = 'myFirstDatabase';
 var mongodbUrl = "mongodb+srv://ths:thspassword@cluster0.yxapw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 var MongoClient = require('mongodb').MongoClient
-
+const mongodb = require('mongodb');
 //used in local-signup strategy
 exports.localReg = function (username, password) {
   var deferred = Q.defer();
@@ -45,8 +45,6 @@ exports.localReg = function (username, password) {
   });
   return deferred.promise;
 };
-
-
 //check if user exists
     //if user exists check if passwords match (use bcrypt.compareSync(password, hash); // true where 'hash' is password in DB)
       //if password matches take into website
