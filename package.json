@@ -15,5 +15,26 @@
   "bugs": {
     "url": "https://github.com/pc9geek/ths/issues"
   },
-  "homepage": "https://github.com/pc9geek/ths#readme"
+  "homepage": "https://github.com/pc9geek/ths#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.5",
+    "ejs": "^3.1.6",
+    "express": "^4.17.1",
+    "express-handlebars": "^5.3.3",
+    "express-session": "^1.17.2",
+    "method-override": "^3.0.0",
+    "mongodb": "^4.1.2",
+    "mongoose": "^6.0.5",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.3",
+    "multer-gridfs-storage": "^5.0.1",
+    "passport": "^0.4.1",
+    "passport-facebook": "^3.0.0",
+    "passport-google": "^0.3.0",
+    "passport-local": "^1.0.0",
+    "passport-twitter": "^1.0.4",
+    "q": "^1.5.1",
+    "util": "^0.12.4"
+  }
 }

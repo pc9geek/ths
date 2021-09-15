@@ -11,13 +11,114 @@ TwitterStrategy = require('passport-twitter'),
 GoogleStrategy = require('passport-google'),
 FacebookStrategy = require('passport-facebook');
 
+
+const crypto = require("crypto");
+const path = require("path");
+const mongoose = require("mongoose");
+const multer = require("multer");
+const {GridFsStorage} = require("multer-gridfs-storage");
+const mongoURI = "mongodb+srv://ths:thspassword@cluster0.yxapw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+
+// connection
+const conn = mongoose.createConnection(mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  });
+
+let gfs;
+conn.once("open", () => {
+  // init stream
+  gfs = new mongoose.mongo.GridFSBucket(conn.db, {
+    bucketName: "uploads"
+  });
+});
+
+const storage = new GridFsStorage({
+    url: mongoURI,
+    file: (req, file) => {
+      return new Promise((resolve, reject) => {
+        crypto.randomBytes(16, (err, buf) => {
+          if (err) {
+            return reject(err);
+          }
+          const filename = buf.toString("hex") + path.extname(file.originalname);
+          const fileInfo = {
+            filename: filename,
+            bucketName: "uploads"
+          };
+          resolve(fileInfo);
+        });
+      });
+    }
+  });  
+  const upload = multer({
+    storage
+  });
+
+
+  
+
 var app=express();
+var config = require('./config.js'), //config file contains all tokens and other private info
+funct = require('./functions.js'); 
 
 
 
 //===============PASSPORT===============
+// Passport session setup.
+passport.serializeUser(function(user, done) {
+  console.log("serializing " + user.username);
+  done(null, user);
+});
 
-//This section will contain our work with Passport
+passport.deserializeUser(function(obj, done) {
+  console.log("deserializing " + obj);
+  done(null, obj);
+});
+// Use the LocalStrategy within Passport to login/"signin" users.
+passport.use('local-signin', new LocalStrategy(
+  {passReqToCallback : true}, //allows us to pass back the request to the callback
+  function(req, username, password, done) {
+    funct.localAuth(username, password)
+    .then(function (user) {
+      if (user) {
+        console.log("LOGGED IN AS: " + user.username);
+        req.session.success = 'You are successfully logged in ' + user.username + '!';
+        done(null, user);
+      }
+      if (!user) {
+        console.log("COULD NOT LOG IN");
+        req.session.error = 'Could not log user in. Please try again.'; //inform user could not log them in
+        done(null, user);
+      }
+    })
+    .fail(function (err){
+      console.log(err.body);
+    });
+  }
+));
+// Use the LocalStrategy within Passport to register/"signup" users.
+passport.use('local-signup', new LocalStrategy(
+  {passReqToCallback : true}, //allows us to pass back the request to the callback
+  function(req, username, password, done) {
+    funct.localReg(username, password)
+    .then(function (user) {
+      if (user) {
+        console.log("REGISTERED: " + user.username);
+        req.session.success = 'You are successfully registered and logged in ' + user.username + '!';
+        done(null, user);
+      }
+      if (!user) {
+        console.log("COULD NOT REGISTER");
+        req.session.error = 'That username is already in use, please try a different one.'; //inform user could not log them in
+        done(null, user);
+      }
+    })
+    .fail(function (err){
+      console.log(err.body);
+    });
+  }
+));
 
 //===============EXPRESS================
 // Configure Express
@@ -57,7 +158,7 @@ app.set('view engine', 'handlebars');
 //===============ROUTES===============
 //displays our homepage
 app.get('/', function(req, res){
-    res.render('home', {user: req.user});
+    res.render('home', {user: req.user, grid: gfs});
   });
   
   //displays our signup page
@@ -89,26 +190,12 @@ app.get('/', function(req, res){
   });
 
 //===============================
-
-const port = process.env.PORT || 3000;
-
-
-
-const { MongoClient } = require('mongodb');
-const uri = "mongodb+srv://ths:thspassword@cluster0.yxapw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-client.connect(err => {
-  const collection = client.db("test").collection("devices");
-  // perform actions on the collection object
-  client.close();
+app.post("/upload", upload.single("file"), (req, res) => {
+  res.redirect("/");
 });
 
 
-
-app.get('/', function (req, res) {
-    res.send('Hello World!');
-  });
-  
+const port = process.env.PORT || 3000;  
   app.listen(3000, function () {
     console.log(`Example app listening on port ${port}`);
   });

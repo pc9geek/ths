@@ -1,18 +1,30 @@
 <!-- views/home.handlebars -->
 {{#if user}}
   <div class="jumbotron">
-    <h1>MongoDB User Authentication</h1>
-    <p>Below is your profile information!</p>
+    <h1>File Sharing Site</h1>
+    <p>Upload and download files</p>
   </div>
   <div class="panel panel-default">
     <div class="panel-heading">
       <h3 class="panel-title">Profile Information</h3>
-    </div>
-    <div class="panel-body">
-      <p>Username: {{user.username}}</p>
-      <p>Avatar: <img src="{{user.avatar}}"/></p>
+      <form action="/upload" method="post" enctype="multipart/form-data">
+            <div class="custom-file mb-3">
+                <input type="file" class="custom-file-input" name="file" id="file1" onchange="readSingleFile(this.files)">
+                <label class="custom-file-label" for="file1" id="file-label">Choose file</label>
+            </div>
+            <input type="submit" value="Submit" class="btn btn-primary btn-block">
+        </form>
+        <div>Test: {{grid.files}} </div>
+      <script>
+        function readSingleFile(e) {
+          const name = e[0].name;
+          document.getElementById("file-label").textContent = name;
+        }
+      </script>
     </div>
   </div>
+
+
 
 {{else}}
   <div class="jumbotron">
