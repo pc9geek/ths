@@ -6,13 +6,14 @@
   </div>
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h3 class="panel-title">File Manager</h3>
+      <h3 class="panel-title">Upload File</h3>
+      
       <form action="/upload" method="post" enctype="multipart/form-data">
             <div class="custom-file mb-3">
                 <input type="file" class="custom-file-input" name="file" id="file1" onchange="readSingleFile(this.files)">
                 <label class="custom-file-label" for="file1" id="file-label">Choose file</label>
             </div>
-            <input type="submit" value="Submit" class="btn btn-primary btn-block">
+            <input type="submit" value="Submit" class="btn btn-primary btn-block ">
         </form>        
       <script>
         function readSingleFile(e) {
@@ -37,8 +38,8 @@
 
 {{else}}
   <div class="jumbotron">
-    <h1>MongoDB User Authentication</h1>
-    <p>Sign in and view your profile!</p>
+    <h1>The Hacking School - Exercise</h1>
+    <p>NodeJS / MongoDB/ Express File Sharing Site</p>
     <p>
       <a href="/signin" class="btn btn-primary btn-lg" role="button">
         <span class="glyphicon glyphicon-user"></span>
