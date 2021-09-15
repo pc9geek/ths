@@ -1,0 +1,19 @@
+{
+  "name": "ths",
+  "version": "1.0.0",
+  "description": "This is a Hacking School Techical Assesment project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pc9geek/ths.git"
+  },
+  "author": "Steven Hall",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pc9geek/ths/issues"
+  },
+  "homepage": "https://github.com/pc9geek/ths#readme"
+}
